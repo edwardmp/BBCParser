@@ -1,5 +1,9 @@
 <?php
 
+namespace BBCParser;
+
+use \DOMDocument;
+
 /**
 * BBCParser
 *
@@ -8,13 +12,13 @@
 * @author Edward Poot <edwardmp@gmail.com>
 * @copyright 2014 Edward Poot
 */
-class BBCParser
+class Parser
 {
 	const URL = 'http://www.bbc.co.uk';
 
 	private $pageSource = NULL;
 
-	public $modulesData = NULL;
+	private $modulesData = NULL;
 
 	/**
 	 * Parses the retrieved HTML, find's relevant module info and stores it in an array
@@ -114,8 +118,6 @@ class BBCParser
 								// only one summary per module, so set it to null
 								$summary = NULL;
 							}
-
-							$title = $articles->getAttribute('title');
 
 							// loop through span tags
 							foreach($articles->getElementsByTagName('span') as $span)

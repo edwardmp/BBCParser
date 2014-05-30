@@ -1,20 +1,19 @@
 <?php
 
-header('Content-Type: text/html; charset=utf-8');
+use BBCParser\Parser;
 
 require 'vendor/autoload.php';
 
-include('BBCParser.php');
+header('Content-Type: text/html; charset=utf-8');
 
 // create BBCParser instance, parse and serialize data
-$parser = new BBCParser();
-+Kint::dump($parser->parseAndSerializeData());
+$parser = new Parser();
+$parser->parseAndSerializeData();
 
-/*
 // return and data for modules
 $sport = $parser->returnDataForModule("Sport");
 $weather = $parser->returnDataForModule("Weather");
-print_r($sport);
-print_r($weather);
-*/
+Kint::dump($sport);
+Kint::dump($weather);
+
 ?>
