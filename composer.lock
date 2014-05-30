@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6f7798e8600ea563aae3be5b571063eb",
+    "hash": "49a518d89a20346ebc7bc4c0a1fd98bc",
     "packages": [
         {
             "name": "raveren/kint",
@@ -63,9 +63,9 @@
     "stability-flags": [
 
     ],
-    "platform": [
-
-    ],
+    "platform": {
+        "php": ">=5.3.0"
+    },
     "platform-dev": [
 
     ]
