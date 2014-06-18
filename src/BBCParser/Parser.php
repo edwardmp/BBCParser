@@ -3,6 +3,7 @@
 namespace BBCParser;
 
 use \DOMDocument;
+use \Exception;
 
 /**
 * BBCParser
@@ -16,7 +17,7 @@ class Parser
 {
 	const URL = 'http://www.bbc.co.uk';
 
-	private $pageSource = NULL;
+	public $pageSource = NULL;
 
 	private $modulesData = NULL;
 
@@ -27,24 +28,40 @@ class Parser
 	 */
 	public function __construct()
 	{
-        $ch = curl_init();
+		$this->fetchData();
+	}
 
-        // set url
-        curl_setopt($ch, CURLOPT_URL, self::URL);
+	public function fetchData()
+	{
+		$ch = curl_init();
 
-        // return the curl result as a string
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		// set url
+		curl_setopt($ch, CURLOPT_URL, self::URL);
 
-        // save output of the curl operation
-        $this->pageSource = curl_exec($ch);
+		// return the curl result as a string
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if (curl_errno($ch))
-        	throw new Exception('CURL error: ' . curl_error($ch));
+		// save output of the curl operation
+		$this->setPageSource(curl_exec($ch));
 
-        // close curl resource
-        curl_close($ch);
+		if (curl_errno($ch))
+			throw new Exception('CURL error: ' . curl_error($ch));
 
-        return $this->pageSource;
+		// close curl resource
+		curl_close($ch);
+
+		return $this->pageSource;
+	}
+
+	public function setPageSource($pageSource = NULL)
+	{
+		if (isset($pageSource))
+		{
+			$this->pageSource = $pageSource;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -72,21 +89,21 @@ class Parser
 				// this is the id tag of the div, which I use to determine the categories
 				$moduleIdentifier = $divTag->getAttribute('id');
 
-				foreach($divTag->getElementsByTagName('div') as $node)
+				foreach ($divTag->getElementsByTagName('div') as $node)
 				{
 					if ($node->hasAttribute('class') && $node->getAttribute('class') === "container")
 					{
 						$summary = NULL;
-						foreach($node->getElementsByTagName('p') as $paragraph)
+						foreach ($node->getElementsByTagName('p') as $paragraph)
 						{
 							// get the summary of the article
 							$summary = trim($paragraph->textContent);
 
 							// get all span tags that are child's of the paragraph
 							$addedSpanTag = array();
-					        foreach ($paragraph->getElementsByTagName('span') as $child)
-					        	if (strlen(trim($child->textContent)) != 0)
-						           $addedSpanTag[] = trim($child->textContent);
+							foreach ($paragraph->getElementsByTagName('span') as $child)
+								if (strlen(trim($child->textContent)) != 0)
+									$addedSpanTag[] = trim($child->textContent);
 
 							// if any spantags are present, add it to the array
 							if ($addedSpanTag)
@@ -94,10 +111,10 @@ class Parser
 						}
 
 						// loop through all dt tags
-						foreach($node->getElementsByTagName('dt') as $dd)
+						foreach ($node->getElementsByTagName('dt') as $dd)
 						{
 							// get all links that are children of the dt tag
-							foreach($dd->getElementsByTagName('a') as $link)
+							foreach ($dd->getElementsByTagName('a') as $link)
 							{
 								$ddChildren["content"] = trim($dd->textContent);
 								$ddChildren["href"] = trim($link->getAttribute('href'));
@@ -107,7 +124,7 @@ class Parser
 						}
 
 						// get all link tag children of the module div
-						foreach($node->getElementsByTagName('a') as $articles)
+						foreach ($node->getElementsByTagName('a') as $articles)
 						{
 							$articleTags = array();
 							// if summary is present add it to array
@@ -120,7 +137,7 @@ class Parser
 							}
 
 							// loop through span tags
-							foreach($articles->getElementsByTagName('span') as $span)
+							foreach ($articles->getElementsByTagName('span') as $span)
 							{
 								$title = trim($span->textContent);
 								// if title is blank, we need to use the heads textContent instead
@@ -133,7 +150,7 @@ class Parser
 							}
 
 							// loop through all images, if any are present
-							foreach($articles->getElementsByTagName('img') as $img)
+							foreach ($articles->getElementsByTagName('img') as $img)
 							{
 								$image["src"] = $img->getAttribute('src');
 								$image["alt"] = $img->getAttribute('alt');
@@ -147,7 +164,7 @@ class Parser
 					}
 				}
 			}
-	    }
+		}
 
 		// remove empty modules
 		array_filter($this->modulesData);
